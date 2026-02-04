@@ -3,107 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOP SECRET ACCESS</title>
+    <title>AI Face Matcher v4.0</title>
     <style>
-        body {
-            background-color: #ffe4e1;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            text-align: center;
-        }
-
-        #box-container {
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        #box-container:hover {
-            transform: scale(1.1);
-        }
-
-        .box {
-            font-size: 100px;
-            animation: shake 0.5s infinite;
-        }
-
-        @keyframes shake {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(5deg); }
-            50% { transform: rotate(0eg); }
-            75% { transform: rotate(-5deg); }
-            100% { transform: rotate(0deg); }
-        }
-
-        #message {
-            display: none;
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 80%;
-        }
-
-        h1 { color: #ff4d6d; }
-        p { font-size: 1.2rem; color: #555; }
+        /* SERIOUS MODE CSS */
+        body { background: #121212; color: #ffffff; font-family: 'Courier New', monospace; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; transition: 0.2s; }
+        #app { width: 90%; max-width: 500px; text-align: center; border: 1px solid #333; padding: 20px; border-radius: 10px; background: #1a1a1a; }
+        .camera-box { width: 100%; border: 2px solid #00ff00; border-radius: 5px; margin-bottom: 15px; overflow: hidden; position: relative; }
+        video, canvas { width: 100%; transform: scaleX(-1); display: block; }
+        .btn { background: #00ff00; color: black; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; width: 100%; border-radius: 5px; }
         
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #f2d74e;
-            top: -10px;
-        }
+        /* RESULT MODE CSS (Hidden at first) */
+        #result-screen { display: none; }
+        .collage { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .card { flex: 1; border: 4px solid #fff; border-radius: 10px; overflow: hidden; background: white; }
+        .card img { width: 100%; height: 200px; object-fit: cover; display: block; }
+        .label { background: #000; color: #fff; font-size: 12px; padding: 5px; }
+        .match-text { color: #ffff00; font-size: 2rem; font-weight: bold; margin-top: 20px; text-shadow: 2px 2px #ff0000; }
     </style>
 </head>
 <body>
 
-    <div id="setup">
-        <h2 id="status">⚠️ A GIFT FROM ME ⚠️</h2>
-        <p>Tap the mystery box to verify your identity...</p>
-        <div id="box-container" onclick="openBox()">
-            <div class="box">🎁</div>
+    <div id="app">
+        <div id="scan-screen">
+            <h2 style="color: #00ff00;">FACIAL DATA CAPTURE</h2>
+            <p style="color: #888;">Initializing rapid biometric scan...</p>
+            <div class="camera-box">
+                <video id="webcam" autoplay playsinline></video>
+                <canvas id="photo-canvas" style="display:none;"></canvas>
+            </div>
+            <div id="status">Awaiting subject...</div>
+            <button class="btn" onclick="startScan()">START SCAN</button>
+        </div>
+
+        <div id="result-screen">
+            <h1 style="margin:0;">SIMILARITY REPORT</h1>
+            <p>Advanced AI Comparison Complete:</p>
+            <div class="collage">
+                <div class="card">
+                    <img id="user-photo" src="">
+                    <div class="label">SUBJECT (YOUR BRO)</div>
+                </div>
+                <div class="card">
+                    <img src="https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?w=500" alt="monkey">
+                    <div class="label">GENETIC MATCH</div>
+                </div>
+            </div>
+            <div class="match-text">99% IDENTICAL! 🐒</div>
+            <p style="color: #ff00ff; font-weight: bold;">(Wait... you look so cute!)</p>
+            <button class="btn" style="background:#fff; margin-top:20px;" onclick="location.reload()">RE-SCAN</button>
         </div>
     </div>
 
-    <div id="message">
-        <h1>🚨 ALERT: GO NERD! GO AND FIND A GIRL FIRST! 🚨</h1>
-        <p>The sensors don't lie. Our advanced AI algorithms have determined that the person holding this phone is, in fact...</p>
-        <h2 style="font-size: 3rem;">ABSOLUTELY NERD.</h2>
-        <p>There is no cure. Please accept your fate gracefully. ✨</p>
-        <button onclick="location.reload()" style="padding: 10px 20px; border: none; border-radius: 10px; background: #ff4d6d; color: white; cursor: pointer;">Scan Someone Else</button>
-    </div>
+    <audio id="joke-sound" src="https://www.myinstants.com/media/sounds/monkey-meme-sound.mp3"></audio>
 
     <script>
-        function openBox() {
-            document.getElementById('setup').style.display = 'none';
-            document.getElementById('message').style.display = 'block';
-            document.body.style.backgroundColor = "#fff0f3";
-            createConfetti();
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('photo-canvas');
+        const userPhoto = document.getElementById('user-photo');
+        const sound = document.getElementById('joke-sound');
+
+        // Access Camera
+        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+            video.srcObject = stream;
+        });
+
+        function startScan() {
+            document.querySelector('.btn').style.display = 'none';
+            let count = 0;
+            const status = document.getElementById('status');
+            const phases = ["Analyzing eyes...", "Measuring ears...", "Scanning brain (empty)...", "Finding match..."];
+
+            const timer = setInterval(() => {
+                status.innerText = phases[count];
+                count++;
+                if (count >= phases.length) {
+                    clearInterval(timer);
+                    showResult();
+                }
+            }, 800);
         }
 
-        function createConfetti() {
-            for(let i=0; i<50; i++) {
-                const conf = document.createElement('div');
-                conf.classList.add('confetti');
-                conf.style.left = Math.random() * 100 + "vw";
-                conf.style.backgroundColor = ["#ff4d6d", "#ffb3c1", "#ff758f", "#c9184a"][Math.floor(Math.random()*4)];
-                conf.style.transform = "rotate(" + Math.random() * 360 + "deg)";
-                document.body.appendChild(conf);
-                
-                const animation = conf.animate([
-                    { top: "-10px", opacity: 1 },
-                    { top: "100vh", opacity: 0 }
-                ], {
-                    duration: Math.random() * 3000 + 2000,
-                    iterations: Infinity
-                });
-            }
+        function showResult() {
+            // Take the photo
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            userPhoto.src = canvas.toDataURL('image/jpeg');
+
+            // Play sound and switch screens
+            sound.play();
+            document.body.style.background = "#ff0055";
+            document.getElementById('scan-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            
+            // Add a little shake
+            document.getElementById('app').animate([
+                { transform: 'rotate(1deg)' }, { transform: 'rotate(-1deg)' }
+            ], { duration: 100, iterations: 10 });
         }
     </script>
 </body>
