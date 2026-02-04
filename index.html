@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOP SECRET ACCESS</title>
+    <style>
+        body {
+            background-color: #ffe4e1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        #box-container {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        #box-container:hover {
+            transform: scale(1.1);
+        }
+
+        .box {
+            font-size: 100px;
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            50% { transform: rotate(0eg); }
+            75% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        #message {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 80%;
+        }
+
+        h1 { color: #ff4d6d; }
+        p { font-size: 1.2rem; color: #555; }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f2d74e;
+            top: -10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="setup">
+        <h2 id="status">⚠️ A GIFT FROM ME ⚠️</h2>
+        <p>Tap the mystery box to verify your identity...</p>
+        <div id="box-container" onclick="openBox()">
+            <div class="box">🎁</div>
+        </div>
+    </div>
+
+    <div id="message">
+        <h1>🚨 ALERT: GO NERD! GO AND FIND A GIRL FIRST! 🚨</h1>
+        <p>The sensors don't lie. Our advanced AI algorithms have determined that the person holding this phone is, in fact...</p>
+        <h2 style="font-size: 3rem;">ABSOLUTELY NERD.</h2>
+        <p>There is no cure. Please accept your fate gracefully. ✨</p>
+        <button onclick="location.reload()" style="padding: 10px 20px; border: none; border-radius: 10px; background: #ff4d6d; color: white; cursor: pointer;">Scan Someone Else</button>
+    </div>
+
+    <script>
+        function openBox() {
+            document.getElementById('setup').style.display = 'none';
+            document.getElementById('message').style.display = 'block';
+            document.body.style.backgroundColor = "#fff0f3";
+            createConfetti();
+        }
+
+        function createConfetti() {
+            for(let i=0; i<50; i++) {
+                const conf = document.createElement('div');
+                conf.classList.add('confetti');
+                conf.style.left = Math.random() * 100 + "vw";
+                conf.style.backgroundColor = ["#ff4d6d", "#ffb3c1", "#ff758f", "#c9184a"][Math.floor(Math.random()*4)];
+                conf.style.transform = "rotate(" + Math.random() * 360 + "deg)";
+                document.body.appendChild(conf);
+                
+                const animation = conf.animate([
+                    { top: "-10px", opacity: 1 },
+                    { top: "100vh", opacity: 0 }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    iterations: Infinity
+                });
+            }
+        }
+    </script>
+</body>
+</html>
